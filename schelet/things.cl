@@ -69,12 +69,3 @@ class Corporal inherits Private {};
 class Sergent inherits Corporal {};
 
 class Officer inherits Sergent {};
-
-class Main inherits IO
-{
-    
-    main() : Object {
-        abort()
-    };
-
-};

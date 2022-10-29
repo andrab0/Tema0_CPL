@@ -148,19 +148,6 @@ class AlphabeticComparator inherits Comparator
     };
 };
 
--- TODO
--- class SamePriceFilter inherits Filter
--- {
---     filter(o : Object): Bool {
---         case o of
---             o : SamePrice => true;
---             o : Object => false;
---         esac
---     };
-
--- };
-
-
 -- Din codul de la curs, sursa moodle
 (*
    The class A2I provides integer-to-string and string-to-integer
@@ -274,83 +261,93 @@ numbers are handled correctly.
         if b then "true" else "false" fi
    };
 
-};
-
-
---  TODO: de sters tot de aici in jos:
-(*******************************
- *** Classes Product-related ***
- *******************************)
- class Product {
-    name : String;
-    model : String;
-    price : Int;
-
-    init(n : String, m: String, p : Int):SELF_TYPE {{
-        name <- n;
-        model <- m;
-        price <- p;
-        self;
-    }};
-
-    getprice():Int{ price * 119 / 100 };
-
-    toString():String {
-        "TODO: implement me"
-    };
-};
-
-class Edible inherits Product {
-    -- VAT tax is lower for foods
-    getprice():Int { price * 109 / 100 };
-};
-
-class Soda inherits Edible {
-    -- sugar tax is 20 bani
-    getprice():Int {price * 109 / 100 + 20};
-};
-
-class Coffee inherits Edible {
-    -- this is technically poison for ants
-    getprice():Int {price * 119 / 100};
-};
-
-class Laptop inherits Product {
-    -- operating system cost included
-    getprice():Int {price * 119 / 100 + 499};
-};
-
-class Router inherits Product {};
-
-(****************************
- *** Classes Rank-related ***
- ****************************)
-class Rank {
-    name : String;
-
-    init(n : String):String {
-        name <- n
+--    metoda pentru tipul bool
+    a2b(s : String) : Bool {
+        if s = "true" then
+            true
+        else
+            false
+        fi
     };
 
-    toString():String {
-        -- Hint: what are the default methods of Object?
-        "TODO: implement me"
-    };
 };
 
-class Private inherits Rank {};
 
-class Corporal inherits Private {};
-
-class Sergent inherits Corporal {};
-
-class Officer inherits Sergent {};
-
-class Main inherits IO
+class StringTokenizer inherits IO
 {
-    
-    main() : Object {
-        abort()
+    separator : String;
+    stringLen : Int;
+    string : String;
+    currentPos : Int;
+    tokensList : List;
+
+    init(separator : String, string : String) : StringTokenizer {
+        {
+            separator <- separators;
+            string <- string;
+            stringLen <- string.length();
+            currentPos <- 0;
+            tokensList <- new List;
+            self;
+        }
     };
 
+    createTokenList() : List {
+        let currToken : String,
+            currPos : Int in
+        {
+            while currPos < stringLen loop
+            {
+                if not string.substr(currentPos, 1) = separator then
+                {
+                    currToken <- currToken.concat(string.substr(currentPos, 1));
+                    currentPos <- currentPos + 1;
+                    currPos <- currentPos + 1;
+                }
+                else
+                {
+                    currentPos <- currentPos + 1;
+                    currPos <- currentPos + 1;
+                } fi;
+            } pool;
+
+            tokensList.add(currToken);
+        }
+    };
+
+    printTokens() : IO {
+        out_string(tokensList.toString())
+    };
+
+    getTokens() : List {
+        tokensList
+    };
+};
+
+class DispatchObjects {
+    castObject(s: String) : Object {
+        if s = "IO" then new IO
+        else if s = "Int" then new Int
+        else if s = "String" then new String
+        else if s = "Bool" then new Bool
+        -- else if s = "Product" then new Product
+        -- else if s = "Edible" then new Edible
+        else if s = "Soda" then new Soda
+        else if s = "Coffee" then new Coffee
+        else if s = "Laptop" then new Laptop
+        else if s = "Router" then new Router
+        -- else if s = "Rank" then new Rank
+        else if s = "Private" then new Private
+        else if s = "Corporal" then new Corporal
+        else if s = "Sergent" then new Sergent
+        else if s = "Officer" then new Officer
+        else if s = "ProductFilter" then new ProductFilter
+        else if s = "RankFilter" then new RankFilter
+        else if s = "SamePriceFilter" then new SamePriceFilter
+        else if s = "PriceComparator" then new PriceComparator
+        else if s = "RankComparator" then new RankComparator
+        else if s = "AlphabeticComparator" then new AlphabeticComparator
+        else abort()
+        fi fi fi fi fi fi fi fi fi fi fi fi fi fi fi fi fi fi
+    };
 };
