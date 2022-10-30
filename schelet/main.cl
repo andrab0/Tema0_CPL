@@ -1,9 +1,10 @@
 class Main inherits IO{
     lists : List <- new List;
+    aux : List <- new List;
     looping : Bool <- true;
     somestr : String;
     stringTokenizer : StringTokenizer <- new StringTokenizer;
-    dispatcher : DispatchObjects <- new DispatchObjects;
+    -- dispatcher : DispatchObjects <- new DispatchObjects;
     atoi : A2I <- new A2I;
 
     -- help function
@@ -20,92 +21,165 @@ class Main inherits IO{
         }
     };
 
-    -- load function
-    load() : List {
-        {
-        let flag : Bool <- true,
+    -- load function -- moartea pulii mele
+    load() : Object {
+    {
+        let flagLooping : Bool <- true,
             line : String,
             objType : Object,
-            currList : List,
-            tokens : List <- new List in
+            currList : List <- new List,
+            token : String <- "" in
+        {
+            -- currList <- new List;
+
+            while flagLooping loop
             {
-                while flag loop
-                {
-                    line <- in_string();
-
-                    if line = "END" then
-                        flag <- false
-                    else
+                line <- in_string();
+            
+                stringTokenizer <- stringTokenizer.init(" ", line);
+                token <- stringTokenizer.getCurrentToken();
+                if token = "Soda" then
                     {
-
-                        -- construiesc lista de tokeni:
-                        tokens <- stringTokenizer.init(line, " ").createTokenList();
-
-                        -- construiesc obiectul pe care il voi adauga in lista
-                        objType <- dispatcher.castObject(tokens.head());
-
-                        --- adaug noul obiect la lista in functie de tipul lui
-                        case objType of
-                            type : IO => currList.cons(objType);
-                            type : Int => currList.cons(objType.init(atoi.a2i(tokens.tail().head())));
-                            type : String => currList.cons(objType.init(tokens.tail().head()));
-                            type : Bool => currList.cons(objType.init(atoi.a2b(tokens.tail().head())));
-                            type : Soda => currList.cons(objType.init(tokens.tail().head(), tokens.tail().tail().head(), atoi.a2i(tokens.tail().tail().tail().head())));
-                            type : Coffee => currList.cons(objType.init(tokens.tail().head(), tokens.tail().tail().head(), atoi.a2i(tokens.tail().tail().tail().head())));
-                            type : Laptop => currList.cons(objType.init(tokens.tail().head(), tokens.tail().tail().head(), atoi.a2i(tokens.tail().tail().tail().head())));
-                            type : Router => currList.cons(objType.init(tokens.tail().head(), tokens.tail().tail().head(), atoi.a2i(tokens.tail().tail().tail().head())));
-                            type : Private => currList.cons(objType.init(tokens.tail().head()));
-                            type : Corporal => currList.cons(objType.init(tokens.tail().head()));
-                            type : Sergent => currList.cons(objType.init(tokens.tail().head()));
-                            type : Officer => currList.cons(objType.init(tokens.tail().head()));
-                        esac;
+                    objType <- new Soda.init(stringTokenizer.getCurrentToken(), stringTokenizer.getCurrentToken(), atoi.a2i(stringTokenizer.getCurrentToken()));
+                    currList <- currList.add(objType);
                     }
-                    fi;
+                else if token = "Coffee" then
+                {
+                    objType <- new Coffee.init(stringTokenizer.getCurrentToken(), stringTokenizer.getCurrentToken(), atoi.a2i(stringTokenizer.getCurrentToken()));
+                    currList <- currList.add(objType);
                 }
-                pool;
-            };
-
-            lists.add(currList);
-        }
+                else if token = "Laptop" then
+                {
+                    objType <- new Laptop.init(stringTokenizer.getCurrentToken(), stringTokenizer.getCurrentToken(), atoi.a2i(stringTokenizer.getCurrentToken()));
+                    currList <- currList.add(objType);
+                }
+                else if token = "Router" then
+                {
+                    objType <- new Router.init(stringTokenizer.getCurrentToken(), stringTokenizer.getCurrentToken(), atoi.a2i(stringTokenizer.getCurrentToken()));
+                    currList <- currList.add(objType);
+                }
+                else if token = "Private" then
+                {
+                    objType <- new Private.init(stringTokenizer.getCurrentToken());
+                    currList <- currList.add(objType);
+                }
+                else if token = "Corporal" then
+                {
+                    objType <- new Corporal.init(stringTokenizer.getCurrentToken());
+                    currList <- currList.add(objType);
+                }
+                else if token = "Sergent" then
+                {
+                    objType <- new Sergent.init(stringTokenizer.getCurrentToken());
+                    currList <- currList.add(objType);
+                }
+                else if token = "Officer" then
+                {
+                    objType <- new Officer.init(stringTokenizer.getCurrentToken());
+                    currList <- currList.add(objType);
+                }
+                else if token = "IO" then
+                {
+                    objType <- new IO;
+                    currList <- currList.add(objType);
+                }
+                else if token = "Int" then
+                {
+                    objType <- atoi.a2i(stringTokenizer.getCurrentToken());
+                    currList <- currList.add(objType);
+                }
+                else if token = "String" then
+                {
+                    objType <- stringTokenizer.getCurrentToken();
+                    currList <- currList.add(objType);
+                }
+                else if token = "Bool" then
+                    {
+                    objType <- atoi.a2b(stringTokenizer.getCurrentToken());
+                    currList <- currList.add(objType);
+                    }   
+                else {flagLooping <- false;}
+                fi fi fi fi fi fi fi fi fi fi fi fi;
+            }
+            pool;
+            lists <- lists.add(new List.cons(currList.reverse()));
+        };
+    }
     };
 
     -- print function
-    print() : IO {
+    print() : Object {
         let i : Int <- 1,
-            listCopy : List <- lists in
+            listCopy : List <- lists.reverse() in
         {
             while not listCopy.isNil() loop
             {
-                if listCopy.head().type_name() = "List" then
-                {
-                    out_int(i).out_string(": ").concat(listCopy.toString()).out_string("\n");
-                    listCopy <- listCopy.tail();
-                    i <- i + 1;
-                }
-                else {
-                    listCopy <- listCopy.tail();
-                    i <- i + 1;
-                } fi;
+                out_int(i).out_string(": [ ").out_string(new List.cons(listCopy.head()).toString()).out_string(" ]\n");
+                listCopy <- listCopy.tail();
+                i <- i + 1;
             } pool;
         }
     };
 
+    print_idx(idx: String) : Object {self};
+
     -- merge function
-    merge(idx1 : String, idx2 : String ) : Object {
-
-        let auxList : List in
+    merge(idx1 : String, idx2 : String ) : List {
+        let auxList : List,
+            listCopy : List <- lists.reverse() in
         {
-            case lists.getListAtIndex(atoi.a2i(idx1 - 1)) of 
-            type : List => auxList <- type;
-            esac;
+            -- out_string("aici\n");
+            -- case lists.getListAtIndex((atoi.a2i(idx1))).head() of 
+            -- type : List => {auxList <- type;};-- out_string(auxList.toString()).out_string("\n"); out_string("1\n");};
+            -- esac;
+                -- out_string(lists.getListAtIndex(atoi.a2i(idx1) - 1).toString()).out_string("\n");
+                -- auxList <- new List.cons(lists.getListAtIndex(atoi.a2i(idx1)));
+                -- out_string(auxList.toString()).out_string("\n");
+                -- auxList <- auxList.append(lists.getListAtIndex(atoi.a2i(idx2)));
+                -- out_string(auxList.toString()).out_string("\n");
 
-            case lists.getListAtIndex(atoi.a2i(idx2 - 1)) of
-            type : List => auxList <- auxList.merge(type);
-            esac;
+                auxList <- new List.cons(listCopy.getListAtIndex((atoi.a2i(idx1) - 1)).append(listCopy.getListAtIndex((atoi.a2i(idx2) - 1))));
+                -- out_string(auxList.toString()).out_string("\n");
 
-            lists <- lists.removeListAtIndex(atoi.a2i(idx1 - 1));
-            lists <- lists.append(auxList);
-            lists <- lists.removeListAtIndex(atoi.a2i(idx2 - 1)); --maybe de schimbat liniile astea 2 intre ele
+                    listCopy <- listCopy.removeListAtIndex((atoi.a2i(idx2) -1));
+                    listCopy <- listCopy.removeListAtIndex((atoi.a2i(idx1) -1));
+                    -- listCopy <- listCopy.add(auxList.reverse());
+
+                    lists <- listCopy.reverse();
+                    lists <- lists.add(new List.cons(auxList.reverse()));
+                    -- lists <- lists.add(listCopy);
+                -- lists <- lists.add(auxList.reverse());
+                -- lists <- lists.removeListAtIndex((atoi.a2i(idx1) - 1));--.removeListAtIndex((atoi.a2i(idx2) - 1));
+
+                -- lists <- listCopy.removeListAtIndex((atoi.a2i(idx2) - 1));
+
+                -- lists.removeListAtIndex(atoi.a2i(idx1));
+            -- lists <- lists.removeListAtIndex(atoi.a2i(idx2));
+-- 
+            -- lists <- lists.removeListAtIndex(atoi.a2i(idx2) - 1);
+            -- lists <- lists.removeListAtIndex(atoi.a2i(idx2));
+
+            -- lists <- listCopy;
+
+            
+            -- lists
+
+
+
+                -- out_string(listCopy.getListAtIndex(atoi.a2i(idx2) - 1).toString()).out_string("\n");
+            -- out_string("aici2\n");
+            -- case listCopy.getListAtIndex((atoi.a2i(idx2))).head() of
+            -- type : List => {auxList <- auxList.append(type); out_string("aici4\n");out_string(auxList.toString()).out_string("\n");};
+            -- esac;
+
+            -- lists <- lists.removeListAtIndex((atoi.a2i(idx1)));
+            -- lists <- lists.add(auxList.reverse());
+            -- lists.getListAtIndex(atoi.a2i(idx1) - 1) <- auxList;
+            -- out_string("aici3\n");
+            -- lists <- lists.append(auxList);
+            -- auxList;
+            -- lists <- lists.removeListAtIndex((atoi.a2i(idx2)));
+             --maybe de schimbat liniile astea 2 intre ele
         }
     };
 
@@ -114,18 +188,27 @@ class Main inherits IO{
         let auxList : List,
             applyedFilter : Filter in
         {
-            case lists.getListAtIndex(atoi.a2i(idx - 1)) of
+            case lists.getListAtIndex(atoi.a2i(idx) - 1) of
             type : List => auxList <- type;
             esac;
 
-            applyedFilter <- dispatcher.castFilter(filter);
-            case filter of
-            type : ProductFilter => auxList <- auxList.filterBy(applyedFilter);
-            type : RankFilter => auxList <- auxList.filterBy(applyedFilter);
-            type : SamePriceFilter => auxList <- auxList.filterBy(applyedFilter);
-            esac;
-
-            lists <- lists.removeListAtIndex(atoi.a2i(idx - 1));
+            if filter = "ProductFilter" then
+                applyedFilter <- new ProductFilter
+            else if filter = "RankFilter" then
+                applyedFilter <- new RankFilter
+            else if filter = "SamePriceFilter" then
+                applyedFilter <- new SamePriceFilter
+            else
+                out_string("Invalid filter name!\n")
+            fi fi fi;
+            -- applyedFilter <- dispatcher.castObject(filter);
+            -- case filter of
+            -- type : ProductFilter => auxList <- auxList.filterBy(applyedFilter);
+            -- type : RankFilter => auxList <- auxList.filterBy(applyedFilter);
+            -- type : SamePriceFilter => auxList <- auxList.filterBy(applyedFilter);
+            -- esac;
+            auxList <- auxList.filterBy(applyedFilter);
+            lists <- lists.removeListAtIndex(atoi.a2i(idx) - 1);
             lists <- lists.append(auxList);
         }
     };
@@ -135,42 +218,50 @@ class Main inherits IO{
         let auxList : List,
             applyedComparator : Comparator in
         {
-            case lists.getListAtIndex(atoi.a2i(idx - 1)) of
+            case lists.getListAtIndex(atoi.a2i(idx) - 1) of
             type : List => auxList <- type;
             esac;
 
-            applyedComparator <- dispatcher.castComparator(comparator);
-            case comparator of
-            type : PriceComparator => auxList <- auxList.sortBy(applyedComparator, order);
-            type : RankComparator => auxList <- auxList.sortBy(applyedComparator, order);
-            type : AlphabeticComparator => auxList <- auxList.sortBy(applyedComparator, order);
-            esac;
-
-            lists <- lists.removeListAtIndex(atoi.a2i(idx - 1));
+            if comparator = "PriceComparator" then
+                applyedComparator <- new PriceComparator
+            else if comparator = "RankComparator" then
+                applyedComparator <- new RankComparator
+            else if comparator = "AlphabeticComparator" then
+                applyedComparator <- new AlphabeticComparator
+            else
+                out_string("Invalid comparator name!\n")
+            fi fi fi;
+            -- applyedComparator <- dispatcher.castObject(comparator);
+            -- case comparator of
+            -- type : PriceComparator => auxList <- auxList.sortBy(applyedComparator, order);
+            -- type : RankComparator => auxList <- auxList.sortBy(applyedComparator, order);
+            -- type : AlphabeticComparator => auxList <- auxList.sortBy(applyedComparator, order);
+            -- esac;
+            auxList <- auxList.sortBy(applyedComparator, order);
+            lists <- lists.removeListAtIndex(atoi.a2i(idx) - 1);
             lists <- lists.append(auxList);
         }
     };
 
     -- main function
     main():Object {
-        let tokens : List in
+        let token : String <- "",
+            param : String <- "" in
         {
             load();
-
             while looping loop
             {
-                out_string(">> ");
+                -- out_string(">> ");
                 somestr <- in_string();
-                tokens <- stringTokenizer.init(somestr, " ").createTokenList();
+                stringTokenizer <- stringTokenizer.init(" ", somestr);
+                token <- stringTokenizer.getCurrentToken();
 
-                if tokens.head() = "help" then help()
-                else if tokens.head() = "load" then load()
-                else if tokens.head() = "print" then print()
-                else if tokens.head() = "merge" then merge(tokens.tail().head(), tokens.tail().tail().head())
-                else if tokens.head() = "filterBy" then filterBy(tokens.tail().head(), tokens.tail().tail().head())
-                else if tokens.head() = "sortBy" then sortBy(tokens.tail().head(), tokens.tail().tail().head(), tokens.tail().tail().tail().head())
-                else abort()
-                fi fi fi fi fi fi;
+                if token = "help" then help()
+                else if token = "load" then load()
+                else if token = "print" then print()
+                else if token = "merge" then merge(stringTokenizer.getCurrentToken(), stringTokenizer.getCurrentToken()) 
+                else looping <- false
+                fi fi fi fi;
             } pool;
         }
     };
